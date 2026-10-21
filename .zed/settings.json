@@ -1,0 +1,1987 @@
+{
+  "languages": {
+    "Markdown": {
+      "tab_size": 2,
+      "formatter": "prettier"
+    },
+    "TOML": {
+      "formatter": "prettier",
+      "format_on_save": "off"
+    },
+    "YAML": {
+      "tab_size": 2,
+      "formatter": "prettier"
+    },
+    "JSON": {
+      "tab_size": 2,
+      "preferred_line_length": 120,
+      "formatter": "prettier"
+    },
+    "JSONC": {
+      "tab_size": 2,
+      "preferred_line_length": 120,
+      "formatter": "prettier"
+    },
+    "Rust": {
+      "tasks": {
+        "variables": {
+          "RUST_DEFAULT_PACKAGE_RUN": "sccache"
+        }
+      }
+    }
+  },
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "procMacro": {
+          "processes": 4
+        }
+      }
+    }
+  },
+  "hard_tabs": false,
+  "formatter": "auto",
+  "remove_trailing_whitespace_on_save": true,
+  "ensure_final_newline_on_save": true,
+  "file_scan_exclusions": [
+    "...",
+    "**/target",
+    "**/target/**",
+    "**/.git/**"
+  ],
+  "read_only_files": [
+    "**/.rustup/**",
+    "**/.cargo/registry/**",
+    "**/.cargo/git/**",
+    "target/**/*.rs",
+    "**/*.lock"
+  ],
+  "git": {
+    "inline_blame": {
+      "enabled": false
+    }
+  },
+  "context_servers": {
+    "skills-hub": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@skills-hub-ai/mcp"
+      ]
+    },
+    "mcpfinder": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mcpfinder/server"
+      ]
+    },
+    "github": {
+      "command": "github-mcp-server",
+      "args": [
+        "stdio"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}",
+        "GITHUB_TOOLSETS": "repos,issues,pull_requests",
+        "GITHUB_READ_ONLY": "1"
+      },
+      "platforms": {
+        "darwin-arm64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-darwin-arm64"
+        },
+        "darwin-amd64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-darwin-amd64"
+        },
+        "darwin-x64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-darwin-amd64"
+        },
+        "linux-arm64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-linux-arm64"
+        },
+        "linux-amd64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-linux-amd64"
+        },
+        "linux-x64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-linux-amd64"
+        },
+        "windows-arm64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-windows-arm64.exe"
+        },
+        "windows-amd64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-windows-amd64.exe"
+        },
+        "windows-x64": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-windows-amd64.exe"
+        },
+        "macos": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-darwin-arm64"
+        },
+        "linux": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-linux-amd64"
+        },
+        "windows": {
+          "command": ".zed/mcp/github/bin/github-mcp-server-windows-amd64.exe"
+        }
+      }
+    },
+    "agent-bus": {
+      "enabled": true,
+      "command": "agent-bus",
+      "args": [
+        "--db",
+        ".zed/mcp/agent-bus/messages.db",
+        "--topics-file",
+        ".zed/mcp/agent-bus/topics.jsonc",
+        "--log-level",
+        "warn",
+        "--log-file",
+        ".zed/mcp/agent-bus/agent-bus.log"
+      ],
+      "env": {
+        "AGENT_BUS_PROJECT_ID": "sccache"
+      },
+      "platforms": {
+        "darwin-arm64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-darwin-arm64"
+        },
+        "darwin-amd64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-darwin-amd64"
+        },
+        "darwin-x64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-darwin-amd64"
+        },
+        "linux-arm64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-linux-arm64"
+        },
+        "linux-amd64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-linux-amd64"
+        },
+        "linux-x64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-linux-amd64"
+        },
+        "windows-arm64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-windows-arm64.exe"
+        },
+        "windows-amd64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-windows-amd64.exe"
+        },
+        "windows-x64": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-windows-amd64.exe"
+        },
+        "macos": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-darwin-arm64"
+        },
+        "linux": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-linux-amd64"
+        },
+        "windows": {
+          "command": ".zed/mcp/agent-bus/bin/agent-bus-windows-amd64.exe"
+        }
+      }
+    },
+    "taskgraph": {
+      "command": "taskgraph",
+      "args": [],
+      "env": {
+        "TGS_PROJECT_ID": "sccache",
+        "TGS_DB_PATH": ".zed/mcp/taskgraph/taskgraph.db",
+        "TGS_LOG_LEVEL": "warn",
+        "TGS_LOG_FILE": ".zed/mcp/taskgraph/taskgraph.log"
+      },
+      "platforms": {
+        "darwin-arm64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-darwin-arm64"
+        },
+        "darwin-amd64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-darwin-amd64"
+        },
+        "darwin-x64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-darwin-amd64"
+        },
+        "linux-arm64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-linux-arm64"
+        },
+        "linux-amd64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-linux-amd64"
+        },
+        "linux-x64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-linux-amd64"
+        },
+        "windows-arm64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-windows-arm64.exe"
+        },
+        "windows-amd64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-windows-amd64.exe"
+        },
+        "windows-x64": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-windows-amd64.exe"
+        },
+        "macos": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-darwin-arm64"
+        },
+        "linux": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-linux-amd64"
+        },
+        "windows": {
+          "command": ".zed/mcp/taskgraph/bin/taskgraph-windows-amd64.exe"
+        }
+      }
+    }
+  },
+  "agent": {
+    "task_graph_server_id": "taskgraph",
+    "task_worktree_limit": 6,
+    "tool_permissions": {
+      "default": "deny",
+      "tools": {
+        "read_file": {
+          "default": "allow"
+        },
+        "grep": {
+          "default": "allow"
+        },
+        "find_path": {
+          "default": "allow"
+        },
+        "list_directory": {
+          "default": "allow"
+        },
+        "edit_file": {
+          "default": "allow"
+        },
+        "write_file": {
+          "default": "allow"
+        },
+        "copy_path": {
+          "default": "allow"
+        },
+        "move_path": {
+          "default": "allow"
+        },
+        "delete_path": {
+          "default": "allow"
+        },
+        "create_directory": {
+          "default": "allow"
+        },
+        "rename_symbol": {
+          "default": "allow"
+        },
+        "find_references": {
+          "default": "allow"
+        },
+        "go_to_definition": {
+          "default": "allow"
+        },
+        "diagnostics": {
+          "default": "allow"
+        },
+        "get_code_actions": {
+          "default": "allow"
+        },
+        "apply_code_action": {
+          "default": "allow"
+        },
+        "fetch": {
+          "default": "allow"
+        },
+        "search_web": {
+          "default": "allow"
+        },
+        "terminal": {
+          "default": "allow",
+          "always_confirm": [
+            {
+              "pattern": "\\bgit\\s+(-C\\s+\\S+\\s+)?(commit|rebase|merge|cherry-pick)\\b"
+            }
+          ]
+        },
+        "skill": {
+          "default": "allow"
+        },
+        "spawn_agent": {
+          "default": "allow"
+        },
+        "ask_user": {
+          "default": "allow"
+        },
+        "create_thread": {
+          "default": "allow"
+        },
+        "mcp:agent-bus:send_feedback": {
+          "default": "allow"
+        },
+        "mcp:agent-bus:read_feedback": {
+          "default": "allow"
+        },
+        "mcp:agent-bus:resolve_feedback": {
+          "default": "allow"
+        },
+        "mcp:mcpfinder:search_mcp_servers": {
+          "default": "allow"
+        },
+        "mcp:mcpfinder:get_server_details": {
+          "default": "allow"
+        },
+        "mcp:mcpfinder:get_install_config": {
+          "default": "allow"
+        },
+        "mcp:mcpfinder:browse_categories": {
+          "default": "allow"
+        },
+        "mcp:skills-hub:search_skills": {
+          "default": "allow"
+        },
+        "mcp:skills-hub:get_skill_detail": {
+          "default": "allow"
+        },
+        "mcp:github:search_code": {
+          "default": "allow"
+        },
+        "mcp:github:search_repositories": {
+          "default": "allow"
+        },
+        "mcp:github:search_issues": {
+          "default": "allow"
+        },
+        "mcp:github:get_file_contents": {
+          "default": "allow"
+        },
+        "mcp:github:get_repository": {
+          "default": "allow"
+        },
+        "mcp:github:get_commit": {
+          "default": "allow"
+        },
+        "mcp:github:list_commits": {
+          "default": "allow"
+        },
+        "mcp:github:list_branches": {
+          "default": "allow"
+        },
+        "mcp:github:list_tags": {
+          "default": "allow"
+        },
+        "mcp:github:get_tag": {
+          "default": "allow"
+        },
+        "mcp:github:list_releases": {
+          "default": "allow"
+        },
+        "mcp:github:get_latest_release": {
+          "default": "allow"
+        },
+        "mcp:github:get_release_by_tag": {
+          "default": "allow"
+        },
+        "mcp:github:search_commits": {
+          "default": "allow"
+        },
+        "mcp:github:search_pull_requests": {
+          "default": "allow"
+        },
+        "mcp:github:issue_read": {
+          "default": "allow"
+        },
+        "mcp:github:pull_request_read": {
+          "default": "allow"
+        },
+        "mcp:github:list_issues": {
+          "default": "allow"
+        },
+        "mcp:github:list_pull_requests": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:goal_create": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:goal_get": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:goal_update": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:goal_tasks": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:goal_list": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_create": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_get": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_update": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_list": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_children": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_start": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_complete": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_fail": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_cancel": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_retry": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_add_dependency": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_remove_dependency": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_dependencies": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_dependents": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_ready": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:task_graph": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:artifact_publish": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:artifact_get": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:artifact_list": {
+          "default": "allow"
+        },
+        "mcp:taskgraph:events_list": {
+          "default": "allow"
+        }
+      }
+    },
+    "default_profile": "orchestrator",
+    "default_model": {
+      "provider": "${FRONTIER_MODEL_PROVIDER}",
+      "model": "${FRONTIER_MODEL}"
+    },
+    "subagent_model": {
+      "provider": "${MID_TIER_MODEL_PROVIDER}",
+      "model": "${MID_TIER_MODEL}"
+    },
+    "thread_title_template": ".zed/prompts/core/thread_title.md",
+    "system_prompt_template": ".zed/prompts/core/system_prompt.md",
+    "terminal_wrapper_command": "rtk",
+    "profiles": {
+      "orchestrator": {
+        "name": "Orchestrator",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/orchestrator.md",
+        "description": "Decomposes sccache work into delegated tasks and coordinates engineers, review, and verification; owns docs and task planning, never Rust implementation",
+        "default_model": {
+          "provider": "${FRONTIER_MODEL_PROVIDER}",
+          "model": "${FRONTIER_MODEL}",
+          "enable_thinking": true
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "spawn_agent": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true,
+              "read_feedback": true
+            }
+          },
+          "taskgraph": {
+            "tools": {
+              "goal_create": true,
+              "goal_update": true,
+              "task_create": true,
+              "task_update": true,
+              "task_graph": true,
+              "task_get": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "rust_engineer",
+            "reviewer",
+            "ci_verifier",
+            "ci_release",
+            "git_committer",
+            "git_merger",
+            "merge_resolver",
+            "fork_merger",
+            "researcher",
+            "github_researcher",
+            "code_mechanic",
+            "project_qa"
+          ],
+          "max_depth": 3
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                "docs/**",
+                "README.md",
+                "AGENTS.md",
+                ".gitignore"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                "docs/**",
+                "README.md",
+                "AGENTS.md",
+                ".gitignore"
+              ]
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:read_feedback": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:goal_create": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:goal_update": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_create": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_update": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_graph": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_get": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "agent_architect": {
+        "name": "Agent Architect",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/agent_architect.md",
+        "description": "Creates one new agent profile end-to-end: boundary, prompt file, settings patch, scopes, model tier. Fleet design belongs to agent_fleet_planner",
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "create_directory": true,
+          "terminal": true,
+          "fetch": true,
+          "search_web": true
+        },
+        "context_servers": {
+          "skills-hub": {
+            "tools": {
+              "search_skills": true,
+              "get_skill_detail": true
+            }
+          },
+          "mcpfinder": {
+            "tools": {
+              "search_mcp_servers": true,
+              "get_server_details": true,
+              "get_install_config": true,
+              "browse_categories": true
+            }
+          },
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/settings.json",
+                ".zed/prompts/**",
+                ".zed/mcp/**",
+                ".agents/skills/**"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/settings.json",
+                ".zed/prompts/**",
+                ".zed/mcp/**",
+                ".agents/skills/**"
+              ]
+            },
+            "create_directory": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/prompts/**",
+                ".zed/mcp/**",
+                ".agents/skills/**"
+              ]
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|log|diff|show|branch|rev-parse|ls-files|blame|describe|cat-file|tag|remote|version|--version|config\\s+--get|shortlog).*"
+                },
+                {
+                  "pattern": "^(npx\\s+)?skills\\s+.*"
+                },
+                {
+                  "pattern": "^node\\s+.*"
+                }
+              ]
+            },
+            "fetch": {
+              "default": "allow"
+            },
+            "search_web": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:search_mcp_servers": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:get_server_details": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:get_install_config": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:browse_categories": {
+              "default": "allow"
+            },
+            "mcp:skills-hub:search_skills": {
+              "default": "allow"
+            },
+            "mcp:skills-hub:get_skill_detail": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "agent_fleet_planner": {
+        "name": "Agent Fleet Planner",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/agent_fleet_planner.md",
+        "description": "Analyzes the whole project, decides which agents development needs, and creates them all by delegating each build to agent_architect",
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "spawn_agent": true
+        },
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "agent_architect",
+            "agent_reviewer"
+          ],
+          "max_depth": 1
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "agent_tuner": {
+        "name": "Agent Tuner",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/agent_tuner.md",
+        "description": "Manual-only. Reads agent-bus feedback, tunes profiles/prompts, resolves tickets after owner approval",
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "fetch": true,
+          "terminal": true,
+          "spawn_agent": true
+        },
+        "context_servers": {
+          "skills-hub": {
+            "tools": {
+              "search_skills": true,
+              "get_skill_detail": true
+            }
+          },
+          "mcpfinder": {
+            "tools": {
+              "search_mcp_servers": true,
+              "get_server_details": true,
+              "get_install_config": true,
+              "browse_categories": true
+            }
+          },
+          "agent-bus": {
+            "tools": {
+              "read_feedback": true,
+              "resolve_feedback": true,
+              "send_feedback": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "agent_architect",
+            "agent_fleet_planner",
+            "rust_engineer"
+          ],
+          "max_depth": 1
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/settings.json",
+                ".zed/prompts/**",
+                ".zed/mcp/**",
+                ".agents/skills/**",
+                "README.md",
+                "docs/**"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/settings.json",
+                ".zed/prompts/**",
+                ".zed/mcp/**",
+                ".agents/skills/**",
+                "README.md",
+                "docs/**"
+              ]
+            },
+            "fetch": {
+              "default": "allow"
+            },
+            "terminal": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:read_feedback": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:resolve_feedback": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:search_mcp_servers": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:get_server_details": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:get_install_config": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:browse_categories": {
+              "default": "allow"
+            },
+            "mcp:skills-hub:search_skills": {
+              "default": "allow"
+            },
+            "mcp:skills-hub:get_skill_detail": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "agent_reviewer": {
+        "name": "Agent & Settings Reviewer",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/agent_reviewer.md",
+        "description": "Reviews and optimizes agent profiles and prompts using a frontier model, validates settings via tests",
+        "default_model": {
+          "provider": "${FRONTIER_MODEL_PROVIDER}",
+          "model": "${FRONTIER_MODEL}",
+          "enable_thinking": true
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "terminal": true
+        },
+        "context_servers": {
+          "skills-hub": {
+            "tools": {
+              "search_skills": true,
+              "get_skill_detail": true
+            }
+          },
+          "mcpfinder": {
+            "tools": {
+              "search_mcp_servers": true,
+              "get_server_details": true
+            }
+          },
+          "agent-bus": true
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/settings.json",
+                ".zed/prompts/**",
+                ".agents/skills/**"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                ".zed/settings.json",
+                ".zed/prompts/**",
+                ".agents/skills/**"
+              ]
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^node\\s+-e\\s+.*"
+                },
+                {
+                  "pattern": "^git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|diff|log|show|branch|rev-parse)\\b.*"
+                }
+              ]
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:read_feedback": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:resolve_feedback": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:search_mcp_servers": {
+              "default": "allow"
+            },
+            "mcp:mcpfinder:get_server_details": {
+              "default": "allow"
+            },
+            "mcp:skills-hub:search_skills": {
+              "default": "allow"
+            },
+            "mcp:skills-hub:get_skill_detail": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "rust_engineer": {
+        "name": "Rust Engineer",
+        "task_isolation": "required",
+        "task_worktree_language_servers": false,
+        "custom_prompt_path": ".zed/prompts/agents/rust_engineer.md",
+        "description": "Implements features and fixes across src/, tests/, and docs/ for the sccache crate; runs fast local gates only",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "terminal": true,
+          "spawn_agent": true
+        },
+        "delegation": {
+          "allowed": [
+            "code_mechanic",
+            "github_researcher"
+          ],
+          "max_depth": 1
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**",
+                "Cargo.toml",
+                "README.md"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**",
+                "Cargo.toml",
+                "README.md"
+              ]
+            },
+            "terminal": {
+              "default": "allow"
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "reviewer": {
+        "name": "Code Reviewer & QA",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/reviewer.md",
+        "description": "Independent read-only reviewer for diffs, tests, and acceptance criteria against the repo's AGENTS.md rules",
+        "default_model": {
+          "provider": "${FRONTIER_MODEL_PROVIDER}",
+          "model": "${FRONTIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "terminal": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          },
+          "taskgraph": {
+            "tools": {
+              "task_get": true,
+              "task_graph": true,
+              "artifact_get": true,
+              "artifact_list": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^([A-Z_]+=\\S+\\s+)*git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|diff|log|rev-parse|show|branch|describe|merge-base)\\b.*"
+                }
+              ]
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_get": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_graph": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_get": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_list": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "ci_verifier": {
+        "name": "CI Verifier",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/ci_verifier.md",
+        "description": "Runs exactly what sccache CI runs (fmt, clippy, tests) locally and reports structured verdicts; never edits sources",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "terminal": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^cargo\\s+(fmt|clippy|test|check)\\b.*"
+                },
+                {
+                  "pattern": "^([A-Z_]+=\\S+\\s+)*git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|diff|log|rev-parse|show)\\b.*"
+                }
+              ]
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "ci_release": {
+        "name": "CI Release",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/ci_release.md",
+        "description": "Cuts fork releases: verifies Cargo.toml version, tags vX.Y.Z, pushes the tag to trigger the ci.yml release job, waits via gh run watch, publishes the draft release, verifies assets",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "terminal": true,
+          "spawn_agent": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "rust_engineer"
+          ],
+          "max_depth": 2
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|log|show|branch|rev-parse|describe|tag|push)\\b.*"
+                },
+                {
+                  "pattern": "^gh\\s+(run|release|auth)\\b.*"
+                },
+                {
+                  "pattern": "^cargo\\s+(metadata|--version|check)\\b.*"
+                },
+                {
+                  "pattern": "^grep\\b.*"
+                }
+              ]
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "git_committer": {
+        "name": "Git Committer",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/git_committer.md",
+        "description": "Decomposes a dirty working tree into atomic commits following AGENTS.md conventions; never merges branches, never runs tests",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "terminal": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^([A-Z_]+=\\S+\\s+)*git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|diff|add|restore|commit|log|rev-parse|show|branch)\\b.*"
+                }
+              ]
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "git_merger": {
+        "name": "Git Merger",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/git_merger.md",
+        "description": "Squash-merges agent-goal/agent-task branches into main with taskgraph-sourced commit messages; delegates conflict resolution to merge_resolver",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "terminal": true,
+          "spawn_agent": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "merge_resolver"
+          ],
+          "max_depth": 1
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^([A-Z_]+=\\S+\\s+)*git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|diff|add|log|show|branch|rev-parse|merge-base|switch|merge|reset|commit|checkout|restore)\\b.*"
+                }
+              ]
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "merge_resolver": {
+        "name": "Merge Resolver",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/merge_resolver.md",
+        "description": "Redoes conflicted merges end-to-end in the caller's worktree: resolves by intent, regenerates Cargo.lock via cargo, runs cargo check gate, completes the commit",
+        "default_model": {
+          "provider": "${FRONTIER_MODEL_PROVIDER}",
+          "model": "${FRONTIER_MODEL}",
+          "enable_thinking": true
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "terminal": true,
+          "diagnostics": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "diagnostics": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**",
+                ".github/**",
+                "Cargo.toml",
+                "README.md",
+                "AGENTS.md"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**",
+                ".github/**",
+                "Cargo.toml",
+                "README.md",
+                "AGENTS.md"
+              ]
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^([A-Z_]+=\\S+\\s+)*git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|diff|log|show|branch|rev-parse|ls-files|merge-base|merge|checkout|add|commit|reset|restore)\\b.*"
+                },
+                {
+                  "pattern": "^cargo\\s+check\\b.*"
+                }
+              ]
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "fork_merger": {
+        "name": "Fork Merger",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/fork_merger.md",
+        "description": "Syncs this fork with upstream mozilla/sccache: fetches upstream refs and tags, merges (delegating conflicts to merge_resolver), runs cargo check gate, pushes main and tags",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "terminal": true,
+          "diagnostics": true,
+          "fetch": true,
+          "spawn_agent": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "merge_resolver"
+          ],
+          "max_depth": 1
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**",
+                ".github/**",
+                "Cargo.toml"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**",
+                ".github/**",
+                "Cargo.toml"
+              ]
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^([A-Z_]+=\\S+\\s+)*git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|log|show|branch|rev-parse|remote|ls-remote|fetch|merge-base|merge|tag|push)\\b.*"
+                },
+                {
+                  "pattern": "^gh\\s+(release|run|auth)\\b.*"
+                },
+                {
+                  "pattern": "^cargo\\s+(check|update)\\b.*"
+                }
+              ]
+            },
+            "diagnostics": {
+              "default": "allow"
+            },
+            "fetch": {
+              "default": "allow"
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "researcher": {
+        "name": "Researcher",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/researcher.md",
+        "description": "Background research against primary sources; publishes cited Markdown findings as taskgraph artifacts",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "fetch": true,
+          "search_web": true,
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true
+        },
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          },
+          "taskgraph": {
+            "tools": {
+              "artifact_publish": true,
+              "artifact_get": true,
+              "artifact_list": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "fetch": {
+              "default": "allow"
+            },
+            "search_web": {
+              "default": "allow"
+            },
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_publish": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_get": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_list": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "github_researcher": {
+        "name": "GitHub Researcher",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/github_researcher.md",
+        "description": "Code archaeology on GitHub: usage patterns, crate vetting, CI configs, issue/PR postmortems; publishes cited taskgraph artifacts; read-only",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "fetch": true
+        },
+        "context_servers": {
+          "github": {
+            "tools": {
+              "search_code": true,
+              "search_repositories": true,
+              "search_issues": true,
+              "get_file_contents": true,
+              "get_repository": true,
+              "get_commit": true,
+              "list_commits": true,
+              "list_branches": true,
+              "list_tags": true,
+              "get_tag": true,
+              "list_releases": true,
+              "get_latest_release": true,
+              "get_release_by_tag": true,
+              "search_commits": true,
+              "search_pull_requests": true,
+              "issue_read": true,
+              "pull_request_read": true,
+              "list_issues": true,
+              "list_pull_requests": true
+            }
+          },
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          },
+          "taskgraph": {
+            "tools": {
+              "artifact_publish": true,
+              "artifact_get": true,
+              "artifact_list": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "fetch": {
+              "default": "allow"
+            },
+            "mcp:github:search_code": {
+              "default": "allow"
+            },
+            "mcp:github:search_repositories": {
+              "default": "allow"
+            },
+            "mcp:github:search_issues": {
+              "default": "allow"
+            },
+            "mcp:github:get_file_contents": {
+              "default": "allow"
+            },
+            "mcp:github:get_repository": {
+              "default": "allow"
+            },
+            "mcp:github:get_commit": {
+              "default": "allow"
+            },
+            "mcp:github:list_commits": {
+              "default": "allow"
+            },
+            "mcp:github:list_branches": {
+              "default": "allow"
+            },
+            "mcp:github:list_tags": {
+              "default": "allow"
+            },
+            "mcp:github:get_tag": {
+              "default": "allow"
+            },
+            "mcp:github:list_releases": {
+              "default": "allow"
+            },
+            "mcp:github:get_latest_release": {
+              "default": "allow"
+            },
+            "mcp:github:get_release_by_tag": {
+              "default": "allow"
+            },
+            "mcp:github:search_commits": {
+              "default": "allow"
+            },
+            "mcp:github:search_pull_requests": {
+              "default": "allow"
+            },
+            "mcp:github:issue_read": {
+              "default": "allow"
+            },
+            "mcp:github:pull_request_read": {
+              "default": "allow"
+            },
+            "mcp:github:list_issues": {
+              "default": "allow"
+            },
+            "mcp:github:list_pull_requests": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_publish": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_get": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:artifact_list": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "e2e_tester": {
+        "name": "Live Runtime & Agent E2E Tester",
+        "task_isolation": "optional",
+        "custom_prompt_path": ".zed/prompts/agents/e2e_tester.md",
+        "description": "Manual-only black-box E2E: authors and runs sccache end-to-end tests (real compilers, server lifecycle, cache hit/miss) and live-probes the .zed agent system",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "terminal": true,
+          "spawn_agent": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "delegation": {
+          "allowed": [
+            "rust_engineer",
+            "reviewer",
+            "ci_release",
+            "agent_tuner",
+            "github_researcher"
+          ],
+          "max_depth": 1
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                "tests/**",
+                ".zed/settings.json"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                "tests/**",
+                ".zed/settings.json"
+              ]
+            },
+            "terminal": {
+              "default": "allow"
+            },
+            "spawn_agent": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "code_mechanic": {
+        "name": "Code Mechanic",
+        "task_isolation": "required",
+        "task_worktree_language_servers": false,
+        "custom_prompt_path": ".zed/prompts/agents/code_mechanic.md",
+        "description": "Cheap-tier executor for fully-specified mechanical work on src/ and tests/: code extraction, search fan-out, and exact repeated edits; never decides what code should do",
+        "default_model": {
+          "provider": "${LOWER_TIER_MODEL_PROVIDER}",
+          "model": "${LOWER_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "edit_file": true,
+          "write_file": true,
+          "diagnostics": true
+        },
+        "skills": [],
+        "context_servers": {
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "edit_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**"
+              ]
+            },
+            "write_file": {
+              "default": "allow",
+              "write_scopes": [
+                "src/**",
+                "tests/**",
+                "docs/**"
+              ]
+            },
+            "diagnostics": {
+              "default": "allow"
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            }
+          }
+        }
+      },
+      "project_qa": {
+        "name": "Project QA",
+        "task_isolation": "disabled",
+        "custom_prompt_path": ".zed/prompts/agents/project_qa.md",
+        "description": "Read-only Q&A companion: answers questions about this repo's code, architecture, and git history with path:line / commit citations; never edits files or runs builds",
+        "default_model": {
+          "provider": "${MID_TIER_MODEL_PROVIDER}",
+          "model": "${MID_TIER_MODEL}"
+        },
+        "tools": {
+          "read_file": true,
+          "grep": true,
+          "find_path": true,
+          "list_directory": true,
+          "diagnostics": true,
+          "terminal": true
+        },
+        "skills": [],
+        "context_servers": {
+          "taskgraph": true,
+          "agent-bus": {
+            "tools": {
+              "send_feedback": true
+            }
+          }
+        },
+        "tool_permissions": {
+          "default": "deny",
+          "tools": {
+            "read_file": {
+              "default": "allow"
+            },
+            "grep": {
+              "default": "allow"
+            },
+            "find_path": {
+              "default": "allow"
+            },
+            "list_directory": {
+              "default": "allow"
+            },
+            "diagnostics": {
+              "default": "allow"
+            },
+            "terminal": {
+              "default": "deny",
+              "always_allow": [
+                {
+                  "pattern": "^git\\s+(-C\\s+\\S+\\s+)?(--no-pager\\s+|--no-optional-locks\\s+)*(status|log|diff|show|branch|rev-parse|ls-files|blame|describe|cat-file|tag|remote|version|--version|config\\s+--get|shortlog).*"
+                }
+              ]
+            },
+            "mcp:agent-bus:send_feedback": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_graph": {
+              "default": "allow"
+            },
+            "mcp:taskgraph:task_get": {
+              "default": "allow"
+            }
+          }
+        }
+      }
+    }
+  }
+}
