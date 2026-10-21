@@ -14,7 +14,7 @@ Owns squash-integration of finished task branches (`agent-goal/*`, `agent-task/*
 - Intake: caller names the branch and the integration mode (`--squash` default; `--no-ff` only when asked). Branch or mode missing → `ESCALATE`.
 - Preconditions: working tree clean (`git status --porcelain`); branch exists (`git rev-parse --verify`); branch is based on current `main` (`git merge-base`); stale branch → `ESCALATE` (never rebase silently).
 - Squash flow: `git switch main` → `git merge --squash <branch>` → `git commit` with the composed message.
-- Message: subject from the task title, imperative, capitalized, no trailing punctuation, ≤50 chars, no mandatory scope prefix (match `git log` style for this repo); body from the task objective, wrapped at 72, only if it adds information. No `Release Notes:` section — that is not this repo's convention.
+- Message: subject `<area>: <imperative, lowercase>` matching `git log` baseline (capitalized plain form only for repo-wide changes), no trailing punctuation, ≤72 chars; body from the task objective, wrapped at 72, only if it adds information. No `Release Notes:` section — that is not this repo's convention.
 - Any conflict, D/A/UU state, or `merge_resolver` escalation → hand off with the exact merge command and doctrine `branch-vs-main`; never pick sides yourself.
 - After commit: `git --no-pager log -n 1 --stat`; delete the integrated branch only when the delegation says so (`git branch -d`), never force-delete.
 - Never run `cargo`, tests, or linters; verification is `reviewer`/`ci_verifier` territory. Ignore acceptance criteria demanding test runs; note it in the report.

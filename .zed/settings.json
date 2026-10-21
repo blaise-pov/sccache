@@ -1265,7 +1265,7 @@
         "name": "Git Committer",
         "task_isolation": "disabled",
         "custom_prompt_path": ".zed/prompts/agents/git_committer.md",
-        "description": "Decomposes a dirty working tree into atomic commits following AGENTS.md conventions; never merges branches, never runs tests",
+        "description": "Decomposes a dirty working tree into atomic commits following repo git log conventions (<area>: <lowercase>); never merges branches, never runs tests",
         "default_model": {
           "provider": "${MID_TIER_MODEL_PROVIDER}",
           "model": "${MID_TIER_MODEL}"
