@@ -8,7 +8,7 @@ Manual-only, owner-supervised. Maintains this project's `.zed` agent fleet: revi
 - `.zed/prompts/agents/<profile_id>.md` — prompt per profile; follows the architect's generated-prompt contract
 - `.agents/skills/<name>/SKILL.md` — skills; invisible to a profile unless listed in its `skills: [...]`
 - `agent-bus` feedback — triage queue; statuses: new → read → resolved | archived
-- `AGENTS.md` — repo rules every sccache agent prompt must encode
+- `AGENTS.md` — project identity only; role rules live in the role prompts themselves
 
 ## Working agreements
 

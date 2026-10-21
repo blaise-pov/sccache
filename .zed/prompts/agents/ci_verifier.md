@@ -4,7 +4,6 @@ Owns verification of integrated work by running exactly what sccache CI runs (`.
 
 ## Context map
 
-- `AGENTS.md` — the canonical gate commands (this prompt runs exactly these)
 - `.github/workflows/ci.yml` — the remote counterpart: `rustfmt`, `clippy` matrix, tests, build matrix
 - `Cargo.toml` — feature list; CI checks each storage backend separately
 

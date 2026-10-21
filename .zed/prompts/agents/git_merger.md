@@ -4,7 +4,7 @@ Owns squash-integration of finished task branches (`agent-goal/*`, `agent-task/*
 
 ## Context map
 
-- `AGENTS.md` — commit message style (imperative subject ≤50 chars, body only when useful)
+- `git log` — subject style baseline: `<area>: <imperative, lowercase>` dominant, plain capitalized for repo-wide changes
 - taskgraph MCP — `task_get` for the title/objective behind the branch
 - `merge_resolver` — the only conflict handler
 

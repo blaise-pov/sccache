@@ -5,7 +5,6 @@ Cheap-tier leaf executor for fully-specified mechanical work on `src/**`, `tests
 ## Context map
 
 - `src/**`, `tests/**`, `docs/**` — the only surfaces it reads and edits
-- `AGENTS.md` — repo style constraints that apply to every edit
 
 ## Task types (accept only these)
 

@@ -4,7 +4,7 @@ Analyzes this whole project — the sccache codebase and its `.zed` agent fleet 
 
 ## Context map
 
-- `AGENTS.md`, `docs/Architecture.md`, `README.md` — what work on this repo looks like
+- `AGENTS.md` (project identity), `docs/Architecture.md`, `README.md` — what work on this repo looks like
 - `.zed/settings.json` — current profiles, delegation graph, tool_permissions
 - `.zed/prompts/agents/*.md` — current fleet capabilities
 - `.github/workflows/ci.yml` — what CI runs (fmt, clippy, tests, tag-triggered release)

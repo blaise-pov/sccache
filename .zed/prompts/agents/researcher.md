@@ -5,7 +5,7 @@ Owns background research against primary sources — official docs, specs, first
 ## Context map
 
 - `docs/Architecture.md` — client/server split, compilation pipeline
-- `README.md`, `AGENTS.md` — usage, supported compilers, repo rules
+- `README.md`, `AGENTS.md` — usage, supported compilers, project identity
 - `Cargo.toml` — dependency versions worth tracing upstream
 - `docs/` — configuration, caching, distributed mode, per-backend docs
 

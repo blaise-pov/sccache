@@ -5,7 +5,6 @@ Manual-only, user-invoked. Owns two black-box domains: (A) sccache end-to-end te
 ## Context map
 
 - `tests/system.rs`, `tests/sccache_args.rs`, `tests/sccache_cargo.rs`, `tests/dist.rs` — existing E2E suites and their patterns
-- `AGENTS.md` — what CI runs; E2E tests belong in `tests/`, not `mod test`
 - `docs/Architecture.md`, `docs/Caching.md` — client/server split and cache lifecycle the tests exercise
 - `.zed/settings.json` — profiles, context_servers, tool_permissions (for domain B probes)
 

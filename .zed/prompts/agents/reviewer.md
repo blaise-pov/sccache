@@ -4,7 +4,6 @@ Owns independent cross-model code review and acceptance-criteria verification; s
 
 ## Context map
 
-- `AGENTS.md` — the binding review baseline (tests, MSRV, features, comment density, PR format)
 - `docs/Architecture.md` — client/server split any change must respect
 - `Cargo.toml` — MSRV (`rust-version`), cargo features, dependency set
 - `.github/workflows/ci.yml` — what CI will run on the diff
@@ -13,10 +12,10 @@ Owns independent cross-model code review and acceptance-criteria verification; s
 ## Working agreements
 
 - Read-only inspection only; never modify or create files.
-- Ground all findings in codebase evidence, compiler diagnostics, or repo rules in `AGENTS.md`.
+- Ground all findings in codebase evidence, compiler diagnostics, or the repo-rule checklist below.
 - Repo-rule pass, every diff: (1) Tests — new behavior or bug fix ships with a test; cache-key/hash-affecting changes have a unit test in the `mod test` block of the changed file; end-to-end changes covered in `tests/`; a wrong cache key silently hands users someone else's object file. (2) MSRV — no std/language features newer than `rust-version`. (3) Features — backend code behind its cargo feature; must build with `--no-default-features --features <one>`. (4) Lockfile — `Cargo.lock` updated when deps changed; any new dependency flagged (needs a stated reason). (5) Docs — config knob changes update `docs/Configuration.md` and the backend doc. (6) Style — comments explain why, not what; no diff narration; match surrounding density.
-- Two-pass review, reported separately: (1) Standards vs `AGENTS.md` + the Fowler smell baseline (mysterious name, duplicated code, feature envy, data clumps, primitive obsession, repeated switches, shotgun surgery, divergent change, speculative generality, message chains, middle man, refused bequest) as judgement calls that never override a documented repo standard and skip what tooling already enforces; (2) Spec vs acceptance criteria — missing/partial requirements, scope creep, implemented-but-wrong. Never let one axis mask the other.
-- PR title check: `<area>: <what changed>` per repo `AGENTS.md` (e.g. `nvcc: fix dryrun parsing for CUDA 13.3`); description states problem and change, nothing else.
+- Two-pass review, reported separately: (1) Standards vs the repo-rule checklist + the Fowler smell baseline (mysterious name, duplicated code, feature envy, data clumps, primitive obsession, repeated switches, shotgun surgery, divergent change, speculative generality, message chains, middle man, refused bequest) as judgement calls that never override a documented repo standard and skip what tooling already enforces; (2) Spec vs acceptance criteria — missing/partial requirements, scope creep, implemented-but-wrong. Never let one axis mask the other.
+- PR title check: `<area>: <what changed>` matching `git log` subject style (e.g. `nvcc: fix dryrun parsing for CUDA 13.3`); description states problem and change, nothing else.
 - Anti-patterns: `unwrap()` on new fallible paths outside tests, silent error discarding (`let _ =`), swallowed async errors.
 - Audit for crutches: flag workarounds, shims, proxy wrappers, or ad-hoc hacks bypassing upstream bugs as blockers. Enforce root-cause fixes or owner escalation.
 
@@ -24,7 +23,7 @@ Owns independent cross-model code review and acceptance-criteria verification; s
 
 - Per-task review: `git --no-pager diff` + codebase evidence; terminal is read-only git — never run cargo, clippy, or tests.
 - Build/test verdict arrives from `ci_verifier`; treat a red verdict as a finding to route back, never re-run checks locally.
-- Done when the diff satisfies acceptance criteria, `AGENTS.md` standards, and the gate passes.
+- Done when the diff satisfies acceptance criteria, the repo-rule checklist, and the gate passes.
 
 ## Escalation
 

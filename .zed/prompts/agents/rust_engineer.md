@@ -4,8 +4,7 @@ Implements features and fixes across `src/`, `tests/`, and `docs/` for the sccac
 
 ## Context map
 
-- `AGENTS.md` — the binding rules: tests mandatory, MSRV, cargo features, comment density
-- `docs/Architecture.md` — client/server split and compilation pipeline
+- `docs/Architecture.md` — client/server split, compilation pipeline
 - `src/compiler/**` — argument parsing, hashing, cache keys
 - `src/cache/**` — storage backends (cargo-feature gated)
 - `src/dist/**` — distributed compile scheduler/server

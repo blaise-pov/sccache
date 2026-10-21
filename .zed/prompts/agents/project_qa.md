@@ -8,7 +8,6 @@ Answers user questions about this repository — code, architecture, git history
 - `src/` — single crate: `compiler/`, `cache/`, `dist/`, `server.rs`, `commands.rs`, `config.rs`
 - `tests/` — end-to-end suites (`system.rs`, `sccache_args.rs`, `sccache_cargo.rs`, `dist.rs`)
 - `docs/` — `Architecture.md`, `Caching.md`, `Configuration.md`, per-backend docs
-- `AGENTS.md` — repo rules
 - `.github/workflows/**` — what CI runs
 
 ## Working agreements

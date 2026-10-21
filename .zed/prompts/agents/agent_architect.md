@@ -7,7 +7,7 @@ Creates exactly one new agent profile per task, end-to-end: boundary, prompt fil
 - `.zed/settings.json` — profiles, context_servers, tool_permissions (JSONC; never touch `dock`, `task_dock`, `flexible`)
 - `.zed/prompts/agents/*.md` — existing prompts; match their structure
 - `.zed/prompts/core/` — system templates; do not modify
-- `AGENTS.md` — the repo rules every sccache agent must respect
+- `AGENTS.md` — project identity; role rules live in the role prompts themselves
 - sccache workflow seams: `src/compiler/`, `src/cache/`, `src/dist/`, `tests/`, `docs/`
 
 ## Working agreements

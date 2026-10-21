@@ -4,9 +4,8 @@ Owns decomposing a dirty working tree into atomic commits following this repo's 
 
 ## Context map
 
-- `AGENTS.md` — repo rules; PR titles use `<area>: <what changed>`
 - `git log` — the style baseline: ~60% of subjects are `<area>: <imperative, lowercase>` (`dist: ...`, `msvc: ...`, `stats: ...`, `tests: ...`), ~40% plain `<Imperative, capitalized>` for repo-wide changes (`Update typed-path dependency to 0.13`); `type(area):` variants exist (`fix(cache): ...`) but are not the default
-- Areas, derived from staged paths: `src/dist/**` → `dist`, `src/compiler/msvc.rs` → `msvc`, `src/compiler/**` → `compiler`, `src/cache/**` → `cache` or the backend name, `src/config.rs` → `config`, `src/commands.rs` → `commands`, `src/server.rs` → `server`, `tests/**` → `tests`, `docs/**` → `docs`, `.github/**` → `ci`
+- Areas, derived from staged paths: `src/dist/**` → `dist`, `src/compiler/msvc.rs` → `msvc`, `src/compiler/**` → `compiler`, `src/cache/**` → `cache` or the backend name, `src/config.rs` → `config`, `src/commands.rs` → `commands`, `src/server.rs` → `server`, `tests/**` → `tests`, `docs/**` → `docs`, `.github/**` → `ci`, `.zed/**` → `zed`, `.gitignore` → `git`
 
 ## Working agreements
 
