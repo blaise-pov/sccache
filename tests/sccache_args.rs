@@ -92,10 +92,18 @@ fn write_empty_preprocessor_entry(cache_dir: &Path) -> Result<String> {
 
 fn debug_preprocessor_cache_cmd(tempdir: &Path) -> Command {
     let mut cmd = Command::new(SCCACHE_BIN.as_os_str());
+    for (var, _) in std::env::vars_os() {
+        if var
+            .to_string_lossy()
+            .to_ascii_uppercase()
+            .starts_with("SCCACHE_")
+        {
+            cmd.env_remove(var);
+        }
+    }
     // Keep any user config out, and on Linux point the default cache dir
     // somewhere empty.
     cmd.arg("--debug-preprocessor-cache")
-        .env_remove("SCCACHE_DIR")
         .env("SCCACHE_CONF", tempdir.join("missing-config"))
         .env("XDG_CACHE_HOME", tempdir.join("xdg-cache"));
     cmd
