@@ -22,3 +22,9 @@ tests/**/Cargo.lock
 result
 .vscode/settings.json
 .env
+.zed/mcp/agent-bus/messages.db
+.zed/mcp/agent-bus/messages.db-shm
+.zed/mcp/agent-bus/messages.db-wal
+.zed/mcp/taskgraph/taskgraph.db
+.zed/mcp/taskgraph/taskgraph.db-shm
+.zed/mcp/taskgraph/taskgraph.db-wal
