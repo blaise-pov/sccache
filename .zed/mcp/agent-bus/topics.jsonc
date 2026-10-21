@@ -1,0 +1,28 @@
+{
+  "topics": {
+    "feedback": {
+      "description": "Friction, improvements, and proposals",
+      "tools": {
+        "send": "Post an improvement proposal. content format: 'impact: quality|resources|speed|bugs|agents | problem: ... | proposal: ...'; sender = your profile id.",
+        "read": "Read messages. Lifecycle: {{statuses}}; mark_read moves to '{{initial_status}}'→'{{read_marks}}'. Content arrives in canonical format shown in send description.",
+        "resolve": "Close a message. Terminal statuses: {{terminal_statuses}}. Optional reply explains what was done."
+      },
+      "limits": {
+        "content_regex": "^impact:\\s*(quality|resources|speed|bugs|agents)\\s*\\|\\s*problem:.*\\|\\s*proposal:.*",
+        "content_min": 1,
+        "content_max": 32768,
+        "sender_min": 1,
+        "sender_max": 128,
+        "reply_max": 4096,
+        "read_limit_default": 20,
+        "read_limit_max": 200
+      },
+      "statuses": {
+        "values": ["new", "read", "resolved", "archived"],
+        "initial": "new",
+        "read_marks": "read",
+        "terminal": ["resolved", "archived"]
+      }
+    }
+  }
+}
