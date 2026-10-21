@@ -27,7 +27,7 @@ use crate::dist::pkg;
 use crate::lru_disk_cache::{LruCache, Meter};
 use crate::mock_command::{CommandCreatorSync, RunCommand};
 use crate::util::{
-    Digest, fmt_duration_as_secs, hash_all, hash_all_archives, run_input_output,
+    Digest, fmt_duration_as_secs, hash_all, hash_all_archives, hash_all_externs, run_input_output,
     strip_path_basedirs,
 };
 use crate::util::{HashToDigest, OsStrExt};
@@ -1818,7 +1818,7 @@ where
             .map(|e| cwd.join(e))
             .collect::<Vec<_>>();
         sort_paths_for_hash(&mut abs_externs, basedirs);
-        let extern_hashes = hash_all(&abs_externs, pool);
+        let extern_hashes = hash_all_externs(&abs_externs, pool);
         // Hash the contents of the staticlibs listed on the commandline.
         trace!(
             "[{}]: hashing {} staticlibs",
