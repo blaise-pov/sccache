@@ -14,6 +14,7 @@ sccache - Shared Compilation Cache
 > Upstream sccache only reuses cached builds if files are located in the exact same path.
 > This fork introduces **cross-directory cache sharing** via `SCCACHE_BASEDIRS`:
 > - **Build in any folder:** Reuse cached results across different Git worktrees and project checkouts.
+> - **Wildcard support for Git worktrees:** Use wildcards like `SCCACHE_BASEDIRS="D:\Projects\zed;D:\Projects\worktrees\zed\*"` or `agent-task-*` to automatically share cache with dynamic worktrees.
 > - **Full Rust and C/C++ support:** Automatically normalizes source paths so identical code is not recompiled.
 > - **Team & CI cache sharing:** Share cache entries between different machines and CI runners even if root folders differ.
 >
@@ -351,6 +352,27 @@ You can also specify multiple base directories by separating them by `;` on Wind
 export SCCACHE_BASEDIRS="/home/user/project:/home/user/workspace"
 ```
 
+### Wildcard matching for Git worktrees
+
+You can specify a wildcard (`*`) in the trailing path component to match dynamic directories, such as Git worktrees, without listing each path manually:
+
+```bash
+# Unix: share cache between main repository and all dynamic worktrees
+export SCCACHE_BASEDIRS="/home/user/zed:/home/user/worktrees/zed/*"
+
+# Or match specific directory prefixes:
+export SCCACHE_BASEDIRS="/home/user/zed:/home/user/worktrees/zed/agent-task-*"
+```
+
+On Windows:
+```cmd
+set SCCACHE_BASEDIRS=D:\Projects\zed;D:\Projects\worktrees\zed\*
+:: Or with a prefix:
+set SCCACHE_BASEDIRS=D:\Projects\zed;D:\Projects\worktrees\zed\agent-task-*
+```
+
+A wildcard in the trailing component matches exactly one directory segment and does not cross path separators. When stripping paths, the entire matched base directory (including the dynamic worktree folder) is removed, ensuring relative paths and cache keys match between the main checkout and any worktree. Exactly matching a worktree root directory (e.g. for compiler `cwd`) normalizes to an empty relative path.
+
 Path matching is **case-insensitive** on Windows and **case-sensitive** on other operating systems.
 
 Base directories are stripped from the preprocessed source and from the compiler arguments alike. The arguments matter because a flag can name the tree it is building: `-ffile-prefix-map=/home/user/project=.` makes the object file independent of where the tree is checked out, but the flag itself is not, and it is hashed verbatim.
@@ -384,8 +406,15 @@ You can also configure this in the sccache config file:
 # Single directory
 basedirs = ["/home/user/project"]
 
-# Or multiple directories
+# Multiple directories
 basedirs = ["/home/user/project", "/home/user/workspace"]
+
+# With wildcards for Git worktrees
+basedirs = [
+    "/home/user/zed",
+    "/home/user/worktrees/zed/*",
+    # or "D:\\Projects\\worktrees\\zed\\agent-task-*" on Windows
+]
 ```
 
 The environment variable applies to each compiler invocation. Its value
