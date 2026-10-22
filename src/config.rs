@@ -1419,26 +1419,88 @@ fn normalize_basedirs(basedirs_raw: impl IntoIterator<Item = Vec<u8>>) -> Result
     let mut basedirs = Vec::new();
     let mut seen = HashSet::new();
     for directory in basedirs_raw {
-        let path = TypedPathBuf::from(directory);
-        if !path.is_absolute() {
-            bail!("Basedir path must be absolute: {:?}", path);
-        }
-
-        // Normalize duplicate separators, current and parent components, and
-        // trailing separators before adding one stable component boundary.
-        let normalized = path.normalize().as_bytes().to_vec();
-        #[cfg(target_os = "windows")]
-        let mut normalized = {
-            let mut normalized = normalize_win_path(&normalized);
-            strip_windows_verbatim_prefix(&mut normalized);
-            normalized
+        let is_separator = |b: u8| -> bool {
+            if cfg!(target_os = "windows") {
+                b == b'/' || b == b'\\'
+            } else {
+                b == b'/'
+            }
         };
-        #[cfg(not(target_os = "windows"))]
-        let mut normalized = normalized;
 
-        if !normalized.ends_with(b"/") {
-            normalized.push(b'/');
-        }
+        let normalized = if !directory.contains(&b'*') {
+            let path = TypedPathBuf::from(directory);
+            if !path.is_absolute() {
+                bail!("Basedir path must be absolute: {:?}", path);
+            }
+
+            // Normalize duplicate separators, current and parent components, and
+            // trailing separators before adding one stable component boundary.
+            let normalized = path.normalize().as_bytes().to_vec();
+            #[cfg(target_os = "windows")]
+            let mut normalized = {
+                let mut normalized = normalize_win_path(&normalized);
+                strip_windows_verbatim_prefix(&mut normalized);
+                normalized
+            };
+            #[cfg(not(target_os = "windows"))]
+            let mut normalized = normalized;
+
+            if !normalized.ends_with(b"/") {
+                normalized.push(b'/');
+            }
+            normalized
+        } else {
+            let mut trimmed = directory.as_slice();
+            while !trimmed.is_empty() && is_separator(trimmed[trimmed.len() - 1]) {
+                trimmed = &trimmed[..trimmed.len() - 1];
+            }
+            let Some(last_sep) = trimmed.iter().rposition(|&b| is_separator(b)) else {
+                bail!(
+                    "Basedir path must be absolute: {:?}",
+                    TypedPathBuf::from(directory)
+                );
+            };
+            if trimmed[..last_sep].contains(&b'*') {
+                bail!(
+                    "Wildcard '*' is only allowed in the trailing component of basedir: {:?}",
+                    TypedPathBuf::from(directory)
+                );
+            }
+            let prefix = &trimmed[..=last_sep];
+            let trailing_comp = &trimmed[last_sep + 1..];
+
+            let prefix_path = TypedPathBuf::from(prefix);
+            if !prefix_path.is_absolute() {
+                bail!(
+                    "Basedir path must be absolute: {:?}",
+                    TypedPathBuf::from(directory)
+                );
+            }
+            let normalized_prefix = prefix_path.normalize().as_bytes().to_vec();
+            #[cfg(target_os = "windows")]
+            let mut normalized_prefix = {
+                let mut normalized = normalize_win_path(&normalized_prefix);
+                strip_windows_verbatim_prefix(&mut normalized);
+                normalized
+            };
+            #[cfg(not(target_os = "windows"))]
+            let mut normalized_prefix = normalized_prefix;
+
+            if !normalized_prefix.ends_with(b"/") {
+                normalized_prefix.push(b'/');
+            }
+
+            #[cfg(target_os = "windows")]
+            let trailing_comp = normalize_win_path(trailing_comp);
+            #[cfg(not(target_os = "windows"))]
+            let trailing_comp = trailing_comp.to_vec();
+
+            normalized_prefix.extend_from_slice(&trailing_comp);
+            if !normalized_prefix.ends_with(b"/") {
+                normalized_prefix.push(b'/');
+            }
+            normalized_prefix
+        };
 
         if seen.insert(normalized.clone()) {
             basedirs.push(normalized);
@@ -3110,6 +3172,58 @@ key_prefix = "cosprefix"
             client_side_mode: false,
         }
     );
+}
+
+#[test]
+#[cfg(not(target_os = "windows"))]
+fn test_normalize_basedirs_wildcard_unix() {
+    let result = normalize_basedirs(vec![
+        b"/work/worktrees/zed/*".to_vec(),
+        b"/work/worktrees/zed/agent-task-*".to_vec(),
+        b"/work/worktrees/zed/agent-task-*/".to_vec(),
+        b"/work/foo/../worktrees/zed/*".to_vec(),
+    ])
+    .unwrap();
+    assert_eq!(
+        result,
+        vec![
+            b"/work/worktrees/zed/*/".to_vec(),
+            b"/work/worktrees/zed/agent-task-*/".to_vec(),
+        ]
+    );
+
+    // Reject wildcards in earlier components
+    assert!(normalize_basedirs(vec![b"/work/*/agent-task-1".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"/work/agent-task-*/crate".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"/work/*/crate/*".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"*".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"relative/dir/*".to_vec()]).is_err());
+}
+
+#[test]
+#[cfg(target_os = "windows")]
+fn test_normalize_basedirs_wildcard_windows() {
+    let result = normalize_basedirs(vec![
+        b"D:\\Projects\\worktrees\\zed\\*".to_vec(),
+        b"D:\\Projects\\worktrees\\zed\\agent-task-*".to_vec(),
+        b"D:\\Projects\\worktrees\\zed\\agent-task-*\\".to_vec(),
+        b"D:\\Projects\\foo\\..\\worktrees\\zed\\*".to_vec(),
+    ])
+    .unwrap();
+    assert_eq!(
+        result,
+        vec![
+            b"d:/projects/worktrees/zed/*/".to_vec(),
+            b"d:/projects/worktrees/zed/agent-task-*/".to_vec(),
+        ]
+    );
+
+    // Reject wildcards in earlier components
+    assert!(normalize_basedirs(vec![b"D:\\Projects\\*\\agent-task-1".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"D:\\Projects\\agent-task-*\\crate".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"D:\\Projects\\*\\crate\\*".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"*".to_vec()]).is_err());
+    assert!(normalize_basedirs(vec![b"relative\\dir\\*".to_vec()]).is_err());
 }
 
 #[test]

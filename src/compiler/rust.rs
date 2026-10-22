@@ -4833,4 +4833,80 @@ foo.rs:
         assert!(!is_rmeta_artifact_notification(b"not json\n"));
         assert!(!is_rmeta_artifact_notification(b""));
     }
+
+    #[test]
+    #[cfg(not(target_os = "windows"))]
+    fn test_strip_rust_wildcard_basedirs_paths() {
+        let basedirs = [
+            b"/work/worktrees/zed/*/".to_vec(),
+            b"/work/worktrees/zed/agent-task-*/".to_vec(),
+        ];
+
+        for (value, expected) in [
+            (
+                b"/work/worktrees/zed/agent-task-1/src/lib.rs".as_slice(),
+                b"src/lib.rs".as_slice(),
+            ),
+            (
+                b"/work/worktrees/zed/main/src/lib.rs".as_slice(),
+                b"src/lib.rs".as_slice(),
+            ),
+            (b"/work/worktrees/zed/agent-task-1", b""),
+            (b"/work/worktrees/zed/agent-task-1/", b""),
+            (b"/work/worktrees/zed/main", b""),
+            (
+                b"/other/worktrees/zed/agent-task-1/src/lib.rs",
+                b"/other/worktrees/zed/agent-task-1/src/lib.rs",
+            ),
+        ] {
+            assert_eq!(strip_path_basedirs(value, &basedirs), expected);
+        }
+    }
+
+    #[test]
+    #[cfg(target_os = "windows")]
+    fn test_strip_rust_wildcard_basedirs_windows_paths() {
+        let basedirs = [
+            b"c:/projects/worktrees/zed/*/".to_vec(),
+            b"d:/projects/worktrees/zed/agent-task-*/".to_vec(),
+        ];
+
+        for (value, expected) in [
+            (
+                b"C:\\Projects\\worktrees\\zed\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"src\\lib.rs".as_slice(),
+            ),
+            (
+                b"D:\\Projects\\worktrees\\zed\\agent-task-42\\src\\main.rs".as_slice(),
+                b"src\\main.rs".as_slice(),
+            ),
+            (b"C:\\Projects\\worktrees\\zed\\agent-task-1", b""),
+            (b"C:\\Projects\\worktrees\\zed\\agent-task-1\\", b""),
+            (b"D:\\Projects\\worktrees\\zed\\agent-task-42", b""),
+            (
+                b"\\\\?\\C:\\Projects\\worktrees\\zed\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"src\\lib.rs".as_slice(),
+            ),
+            (b"\\\\?\\C:\\Projects\\worktrees\\zed\\agent-task-1", b""),
+            (
+                b"E:\\Projects\\worktrees\\zed\\agent-task-1\\src\\lib.rs",
+                b"E:\\Projects\\worktrees\\zed\\agent-task-1\\src\\lib.rs",
+            ),
+        ] {
+            assert_eq!(strip_path_basedirs(value, &basedirs), expected);
+        }
+
+        assert_eq!(
+            rust_argument_key(
+                r"C:\Projects\worktrees\zed\agent-task-1\src\lib.rs",
+                None,
+                Some(&[b"c:/projects/worktrees/zed/*/".to_vec()])
+            ),
+            rust_argument_key(
+                r"C:\Projects\worktrees\zed\agent-task-2\src\lib.rs",
+                None,
+                Some(&[b"c:/projects/worktrees/zed/*/".to_vec()])
+            )
+        );
+    }
 }

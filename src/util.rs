@@ -1258,33 +1258,102 @@ pub fn strip_basedirs<'a>(preprocessor_output: &'a [u8], basedirs: &[Vec<u8>]) -
     for (idx, basedir_bytes) in basedirs.iter().enumerate() {
         let basedir = basedir_bytes.as_slice();
 
-        // On Windows, preprocessor output quotes paths as C string literals
-        // (#line directives and GNU linemarkers), so backslash separators
-        // appear escaped: `#line 1 "C:\\dir\\file.h"`. normalize_win_path
-        // converts each backslash to a forward slash, which turns every
-        // escaped separator into a DOUBLE forward slash ("c://dir//file.h").
-        // Search for that doubled variant of the basedir as well, otherwise
-        // such paths are never stripped.
-        #[cfg(target_os = "windows")]
-        let doubled_basedir = double_path_separators(basedir);
-        #[cfg(target_os = "windows")]
-        let needles: [&[u8]; 2] = [basedir, &doubled_basedir];
-        #[cfg(not(target_os = "windows"))]
-        let needles: [&[u8]; 1] = [basedir];
+        if !basedir.contains(&b'*') {
+            // On Windows, preprocessor output quotes paths as C string literals
+            // (#line directives and GNU linemarkers), so backslash separators
+            // appear escaped: `#line 1 "C:\\dir\\file.h"`. normalize_win_path
+            // converts each backslash to a forward slash, which turns every
+            // escaped separator into a DOUBLE forward slash ("c://dir//file.h").
+            // Search for that doubled variant of the basedir as well, otherwise
+            // such paths are never stripped.
+            #[cfg(target_os = "windows")]
+            let doubled_basedir = double_path_separators(basedir);
+            #[cfg(target_os = "windows")]
+            let needles: [&[u8]; 2] = [basedir, &doubled_basedir];
+            #[cfg(not(target_os = "windows"))]
+            let needles: [&[u8]; 1] = [basedir];
 
-        for needle in needles {
-            // Use memchr's fast substring search
-            let finder = memchr::memmem::find_iter(normalized_output, needle);
+            for needle in needles {
+                // Use memchr's fast substring search
+                let finder = memchr::memmem::find_iter(normalized_output, needle);
 
-            for pos in finder {
-                // Check if this is a valid boundary (start, whitespace, quote, or '<')
-                let is_boundary = pos == 0
-                    || normalized_output[pos - 1].is_ascii_whitespace()
-                    || normalized_output[pos - 1] == b'"'
-                    || normalized_output[pos - 1] == b'<';
+                for pos in finder {
+                    // Check if this is a valid boundary (start, whitespace, quote, or '<')
+                    let is_boundary = pos == 0
+                        || normalized_output[pos - 1].is_ascii_whitespace()
+                        || normalized_output[pos - 1] == b'"'
+                        || normalized_output[pos - 1] == b'<';
 
-                if is_boundary {
-                    matches.push((pos, needle.len(), idx));
+                    if is_boundary {
+                        matches.push((pos, needle.len(), idx));
+                    }
+                }
+            }
+        } else {
+            if !basedir.ends_with(b"/") {
+                continue;
+            }
+            let without_slash = &basedir[..basedir.len() - 1];
+            let Some(last_slash) = without_slash.iter().rposition(|&b| b == b'/') else {
+                continue;
+            };
+            let prefix = &basedir[..=last_slash];
+            let pattern = &without_slash[last_slash + 1..];
+
+            #[cfg(target_os = "windows")]
+            let doubled_prefix = double_path_separators(prefix);
+            #[cfg(target_os = "windows")]
+            let needles: [&[u8]; 2] = [prefix, &doubled_prefix];
+            #[cfg(not(target_os = "windows"))]
+            let needles: [&[u8]; 1] = [prefix];
+
+            for needle in needles {
+                let finder = memchr::memmem::find_iter(normalized_output, needle);
+
+                for pos in finder {
+                    let is_boundary = pos == 0
+                        || normalized_output[pos - 1].is_ascii_whitespace()
+                        || normalized_output[pos - 1] == b'"'
+                        || normalized_output[pos - 1] == b'<';
+
+                    if !is_boundary {
+                        continue;
+                    }
+
+                    let rem = &normalized_output[pos + needle.len()..];
+                    let comp_len = rem
+                        .iter()
+                        .position(|&b| {
+                            matches!(
+                                b,
+                                b'/' | b'\\'
+                                    | b'"'
+                                    | b'\''
+                                    | b'<'
+                                    | b'>'
+                                    | b'\n'
+                                    | b'\r'
+                                    | b'\t'
+                                    | b' '
+                            )
+                        })
+                        .unwrap_or(rem.len());
+                    let comp = &rem[..comp_len];
+                    let is_match = if cfg!(target_os = "windows") {
+                        wildcard_match_ascii_case_insensitive(pattern, comp)
+                    } else {
+                        wildcard_match(pattern, comp)
+                    };
+                    if comp.is_empty() || !is_match {
+                        continue;
+                    }
+
+                    let slash_count = rem[comp_len..]
+                        .iter()
+                        .take_while(|&&b| matches!(b, b'/' | b'\\'))
+                        .count();
+                    let match_len = needle.len() + comp_len + slash_count;
+                    matches.push((pos, match_len, idx));
                 }
             }
         }
@@ -1389,11 +1458,50 @@ pub fn strip_basedirs_from_arg<'a>(arg: &'a [u8], basedirs: &[Vec<u8>]) -> Cow<'
             // component can also end at the end of the argument, or at a
             // separator such as the `=` of -ffile-prefix-map.
             let with_slash = basedirs[i].as_slice();
-            let bare = &with_slash[..with_slash.len() - 1];
-            if rest.starts_with(with_slash) {
-                matched = with_slash.len();
-            } else if rest.starts_with(bare) && matches!(rest.get(bare.len()), None | Some(b'=')) {
-                matched = bare.len();
+            if !with_slash.contains(&b'*') {
+                let bare = &with_slash[..with_slash.len() - 1];
+                if rest.starts_with(with_slash) {
+                    matched = with_slash.len();
+                } else if rest.starts_with(bare)
+                    && matches!(rest.get(bare.len()), None | Some(b'='))
+                {
+                    matched = bare.len();
+                }
+            } else {
+                if !with_slash.ends_with(b"/") {
+                    continue;
+                }
+                let without_slash = &with_slash[..with_slash.len() - 1];
+                let Some(last_slash) = without_slash.iter().rposition(|&b| b == b'/') else {
+                    continue;
+                };
+                let prefix = &with_slash[..=last_slash];
+                let pattern = &without_slash[last_slash + 1..];
+
+                if rest.starts_with(prefix) {
+                    let after_prefix = &rest[prefix.len()..];
+                    let comp_end = after_prefix
+                        .iter()
+                        .position(|&b| b == b'/' || b == b'=')
+                        .unwrap_or(after_prefix.len());
+                    let comp = &after_prefix[..comp_end];
+                    let is_match = if cfg!(target_os = "windows") {
+                        wildcard_match_ascii_case_insensitive(pattern, comp)
+                    } else {
+                        wildcard_match(pattern, comp)
+                    };
+                    if !comp.is_empty() && is_match {
+                        if after_prefix.get(comp_end) == Some(&b'/') {
+                            let slash_count = after_prefix[comp_end..]
+                                .iter()
+                                .take_while(|&&b| b == b'/')
+                                .count();
+                            matched = prefix.len() + comp_end + slash_count;
+                        } else if matches!(after_prefix.get(comp_end), None | Some(b'=')) {
+                            matched = prefix.len() + comp_end;
+                        }
+                    }
+                }
             }
             if matched > 0 {
                 trace!(
@@ -1463,6 +1571,71 @@ fn pathname_positions(arg: &[u8]) -> impl Iterator<Item = usize> + '_ {
     positions.sort_unstable();
     positions.dedup();
     positions.into_iter().filter(move |&p| p < arg.len())
+}
+
+pub(crate) fn wildcard_match(pattern: &[u8], text: &[u8]) -> bool {
+    let mut p_idx = 0;
+    let mut t_idx = 0;
+    let mut star_idx = None;
+    let mut match_idx = 0;
+
+    while t_idx < text.len() {
+        if p_idx < pattern.len() && pattern[p_idx] == text[t_idx] {
+            p_idx += 1;
+            t_idx += 1;
+        } else if p_idx < pattern.len() && pattern[p_idx] == b'*' {
+            star_idx = Some(p_idx);
+            p_idx += 1;
+            match_idx = t_idx;
+        } else if let Some(star) = star_idx {
+            p_idx = star + 1;
+            match_idx += 1;
+            t_idx = match_idx;
+        } else {
+            return false;
+        }
+    }
+
+    while p_idx < pattern.len() && pattern[p_idx] == b'*' {
+        p_idx += 1;
+    }
+
+    p_idx == pattern.len()
+}
+
+pub(crate) fn wildcard_match_ascii_case_insensitive(pattern: &[u8], text: &[u8]) -> bool {
+    let mut p_idx = 0;
+    let mut t_idx = 0;
+    let mut star_idx = None;
+    let mut match_idx = 0;
+
+    while t_idx < text.len() {
+        let p_byte = pattern.get(p_idx).copied();
+        let t_byte = text[t_idx].to_ascii_lowercase();
+
+        if let Some(p) = p_byte
+            && p.to_ascii_lowercase() == t_byte
+        {
+            p_idx += 1;
+            t_idx += 1;
+        } else if let Some(b'*') = p_byte {
+            star_idx = Some(p_idx);
+            p_idx += 1;
+            match_idx = t_idx;
+        } else if let Some(star) = star_idx {
+            p_idx = star + 1;
+            match_idx += 1;
+            t_idx = match_idx;
+        } else {
+            return false;
+        }
+    }
+
+    while p_idx < pattern.len() && pattern[p_idx] == b'*' {
+        p_idx += 1;
+    }
+
+    p_idx == pattern.len()
 }
 
 #[cfg(any(target_os = "windows", test))]
@@ -1560,20 +1733,49 @@ pub fn strip_path_basedirs<'a>(value: &'a [u8], basedirs: &[Vec<u8>]) -> &'a [u8
     {
         let mut longest = None;
         for basedir in basedirs.iter().filter(|basedir| basedir.ends_with(b"/")) {
-            let root = &basedir[..basedir.len() - 1];
-            let match_len = if value == root {
-                Some(root.len())
-            } else if value.starts_with(basedir) {
-                Some(basedir.len())
+            let configured_len = basedir.len();
+            let root = &basedir[..configured_len - 1];
+            let match_len = if !basedir.contains(&b'*') {
+                if value == root {
+                    Some(root.len())
+                } else if value.starts_with(basedir) {
+                    Some(basedir.len())
+                } else {
+                    None
+                }
             } else {
-                None
+                let without_slash = root;
+                if let Some(last_slash) = without_slash.iter().rposition(|&b| b == b'/') {
+                    let prefix = &basedir[..=last_slash];
+                    let pattern = &without_slash[last_slash + 1..];
+                    if value.starts_with(prefix) {
+                        let rem = &value[prefix.len()..];
+                        let comp_len = rem.iter().position(|&b| b == b'/').unwrap_or(rem.len());
+                        let comp = &rem[..comp_len];
+                        if !comp.is_empty() && wildcard_match(pattern, comp) {
+                            let slash_count =
+                                rem[comp_len..].iter().take_while(|&&b| b == b'/').count();
+                            Some(prefix.len() + comp_len + slash_count)
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
             };
-            if match_len > longest {
-                longest = match_len;
+            if let Some(match_len) = match_len {
+                if longest.is_none_or(|(length, match_l)| {
+                    match_len > match_l || (match_len == match_l && configured_len > length)
+                }) {
+                    longest = Some((configured_len, match_len));
+                }
             }
         }
 
-        longest.map_or(value, |length| &value[length..])
+        longest.map_or(value, |(_, length)| &value[length..])
     }
 }
 
@@ -1595,15 +1797,54 @@ fn strip_windows_path_basedirs<'a>(value: &'a [u8], basedirs: &[Vec<u8>]) -> &'a
     let mut longest = None;
     for basedir in basedirs.iter().filter(|basedir| basedir.ends_with(b"/")) {
         let configured_len = basedir.len();
-        let root = basedir[..configured_len - 1].strip_prefix(basedir_prefix);
-        let prefix = basedir.strip_prefix(basedir_prefix);
-        let exact_match = root.and_then(|root| {
-            windows_path_prefix_len(tail, root).filter(|length| *length == tail.len())
-        });
-        let match_end =
-            exact_match.or_else(|| prefix.and_then(|prefix| windows_path_prefix_len(tail, prefix)));
+        let match_end = if !basedir.contains(&b'*') {
+            let root = basedir[..configured_len - 1].strip_prefix(basedir_prefix);
+            let prefix = basedir.strip_prefix(basedir_prefix);
+            let exact_match = root.and_then(|root| {
+                windows_path_prefix_len(tail, root).filter(|length| *length == tail.len())
+            });
+            exact_match.or_else(|| prefix.and_then(|prefix| windows_path_prefix_len(tail, prefix)))
+        } else {
+            let Some(basedir_no_vprefix) = basedir.strip_prefix(basedir_prefix) else {
+                continue;
+            };
+            let without_slash = &basedir_no_vprefix[..basedir_no_vprefix.len() - 1];
+            if let Some(last_slash) = without_slash.iter().rposition(|&b| b == b'/') {
+                let prefix_part = &basedir_no_vprefix[..=last_slash];
+                let pattern = &without_slash[last_slash + 1..];
+                if let Some(prefix_match_len) = windows_path_prefix_len(tail, prefix_part) {
+                    let rem = &tail[prefix_match_len..];
+                    let comp_len = rem
+                        .iter()
+                        .position(|&b| matches!(b, b'/' | b'\\'))
+                        .unwrap_or(rem.len());
+                    let comp = &rem[..comp_len];
+                    if !comp.is_empty() && wildcard_match_ascii_case_insensitive(pattern, comp) {
+                        let sep_count = rem[comp_len..]
+                            .iter()
+                            .take_while(|&&b| matches!(b, b'/' | b'\\'))
+                            .count();
+                        if sep_count > 0 {
+                            Some(prefix_match_len + comp_len + sep_count)
+                        } else {
+                            // Exact match on root worktree path without trailing separator
+                            Some(tail.len())
+                        }
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        };
+
         if let Some(match_end) = match_end
-            && longest.is_none_or(|(length, _)| configured_len > length)
+            && longest.is_none_or(|(length, end)| {
+                configured_len > length || (configured_len == length && match_end > end)
+            })
         {
             longest = Some((configured_len, match_end));
         }
@@ -2679,5 +2920,261 @@ mod tests {
             .await
             .unwrap();
         assert_ne!(h1, h2);
+    }
+
+    #[test]
+    fn test_wildcard_match() {
+        assert!(super::wildcard_match(b"*", b""));
+        assert!(super::wildcard_match(b"*", b"abc"));
+        assert!(super::wildcard_match(b"agent-task-*", b"agent-task-1"));
+        assert!(super::wildcard_match(b"agent-task-*", b"agent-task-"));
+        assert!(super::wildcard_match(b"*-task", b"agent-task"));
+        assert!(super::wildcard_match(b"agent-*-task", b"agent-foo-task"));
+        assert!(!super::wildcard_match(b"agent-task-*", b"other-task-1"));
+        assert!(!super::wildcard_match(b"agent-task-*", b"agent-task"));
+        assert!(!super::wildcard_match(b"exact", b"different"));
+
+        assert!(super::wildcard_match_ascii_case_insensitive(
+            b"AGENT-TASK-*",
+            b"agent-task-1",
+        ));
+        assert!(super::wildcard_match_ascii_case_insensitive(
+            b"agent-task-*",
+            b"AGENT-TASK-1",
+        ));
+        assert!(!super::wildcard_match_ascii_case_insensitive(
+            b"agent-task-*",
+            b"OTHER-TASK-1",
+        ));
+    }
+
+    #[test]
+    fn test_strip_basedirs_wildcard() {
+        let basedirs = vec![
+            b"/work/worktrees/zed/*/".to_vec(),
+            b"/work/worktrees/zed/agent-task-*/".to_vec(),
+        ];
+
+        let input =
+            b"# 1 \"/work/worktrees/zed/agent-task-1/src/main.c\"\\nint main() { return 0; }";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"src/main.c\"\\nint main() { return 0; }");
+
+        let input = b"# 1 \"/work/worktrees/zed/agent-task-1\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"\"");
+
+        let input = b"# 1 \"/work/worktrees/zed/agent-task-1/\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"\"");
+
+        let input = b"# 1 \"/work/worktrees/zed/random-branch/src/lib.rs\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"src/lib.rs\"");
+
+        let input = b"# 1 \"/other/worktrees/zed/agent-task-1/src/main.c\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, input);
+
+        let input = b"# 1 \"/work/worktrees/zed/sub/dir/src/main.c\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"dir/src/main.c\"");
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn test_strip_basedir_windows_wildcard() {
+        let basedirs = vec![
+            b"c:/work/worktrees/zed/*/".to_vec(),
+            b"c:/work/worktrees/zed/agent-task-*/".to_vec(),
+        ];
+
+        let input = b"#line 1 \"C:\\\\Work\\\\Worktrees\\\\Zed\\\\agent-task-1\\\\src\\\\main.c\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"#line 1 \"src\\\\main.c\"");
+
+        let input = b"# 1 \"C:/Work/Worktrees/Zed/agent-task-1/src/main.c\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"src/main.c\"");
+
+        let input = b"# 1 \"C:\\Work\\Worktrees\\Zed\\agent-task-1\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"\"");
+
+        let input = b"# 1 \"C:\\Work\\Worktrees\\Zed\\agent-task-1\\\"";
+        let output = super::strip_basedirs(input, &basedirs);
+        assert_eq!(&*output, b"# 1 \"\"");
+    }
+
+    #[test]
+    fn test_strip_basedirs_from_arg_wildcard() {
+        let basedirs = vec![
+            b"/work/worktrees/zed/*/".to_vec(),
+            b"/work/worktrees/zed/agent-task-*/".to_vec(),
+        ];
+
+        assert_eq!(
+            &*super::strip_basedirs_from_arg(b"-I/work/worktrees/zed/agent-task-1/src", &basedirs),
+            b"-Isrc"
+        );
+        assert_eq!(
+            &*super::strip_basedirs_from_arg(b"-I/work/worktrees/zed/agent-task-1", &basedirs),
+            b"-I"
+        );
+        assert_eq!(
+            &*super::strip_basedirs_from_arg(
+                b"-ffile-prefix-map=/work/worktrees/zed/agent-task-1=.",
+                &basedirs
+            ),
+            b"-ffile-prefix-map==."
+        );
+        assert_eq!(
+            &*super::strip_basedirs_from_arg(
+                b"-ffile-prefix-map=/work/worktrees/zed/agent-task-1/src=.",
+                &basedirs
+            ),
+            b"-ffile-prefix-map=src=."
+        );
+        assert_eq!(
+            &*super::strip_basedirs_from_arg(b"-I/other/path/src", &basedirs),
+            b"-I/other/path/src"
+        );
+
+        #[cfg(target_os = "windows")]
+        {
+            let win_basedirs = vec![b"c:/work/worktrees/zed/*/".to_vec()];
+            assert_eq!(
+                &*super::strip_basedirs_from_arg(
+                    b"-IC:\\Work\\Worktrees\\Zed\\agent-task-1\\src",
+                    &win_basedirs
+                ),
+                b"-Isrc"
+            );
+            assert_eq!(
+                &*super::strip_basedirs_from_arg(
+                    b"-ffile-prefix-map=C:\\Work\\Worktrees\\Zed\\agent-task-1=.",
+                    &win_basedirs
+                ),
+                b"-ffile-prefix-map==."
+            );
+            assert_eq!(
+                &*super::strip_basedirs_from_arg(
+                    b"-IC:\\Work\\Worktrees\\Zed\\agent-task-1",
+                    &win_basedirs
+                ),
+                b"-I"
+            );
+        }
+    }
+
+    #[test]
+    fn test_strip_windows_path_basedirs_wildcard() {
+        let basedirs = vec![
+            b"c:/projects/worktrees/zed/*/".to_vec(),
+            b"c:/projects/worktrees/zed/agent-task-*/".to_vec(),
+            b"//server/share/worktrees/*/".to_vec(),
+        ];
+
+        for (input, expected) in [
+            (
+                b"C:\\Projects\\worktrees\\zed\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"src\\lib.rs".as_slice(),
+            ),
+            (
+                b"C:/Projects/worktrees/zed/agent-task-1/src/lib.rs".as_slice(),
+                b"src/lib.rs".as_slice(),
+            ),
+            (
+                b"c:\\projects\\worktrees\\zed\\agent-task-1".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"c:\\projects\\worktrees\\zed\\agent-task-1\\".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"C:/Projects/worktrees/zed/agent-task-1/".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"\\\\?\\C:\\Projects\\worktrees\\zed\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"src\\lib.rs".as_slice(),
+            ),
+            (
+                b"\\\\?\\C:\\Projects\\worktrees\\zed\\agent-task-1".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"\\\\?\\UNC\\Server\\Share\\Worktrees\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"src\\lib.rs".as_slice(),
+            ),
+            (
+                b"\\\\?\\UNC\\Server\\Share\\Worktrees\\agent-task-1".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"\\\\Server\\Share\\Worktrees\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"src\\lib.rs".as_slice(),
+            ),
+            (
+                b"C:\\PROJECTS\\WORKTREES\\ZED\\AGENT-TASK-1\\SRC\\LIB.RS".as_slice(),
+                b"SRC\\LIB.RS".as_slice(),
+            ),
+            (
+                b"C:\\Projects\\worktrees\\other\\agent-task-1\\src\\lib.rs".as_slice(),
+                b"C:\\Projects\\worktrees\\other\\agent-task-1\\src\\lib.rs".as_slice(),
+            ),
+            (
+                b"C:\\Projects\\worktrees\\zed\\agent-task-1\\sub\\src\\lib.rs".as_slice(),
+                b"sub\\src\\lib.rs".as_slice(),
+            ),
+        ] {
+            assert_eq!(
+                super::strip_windows_path_basedirs(input, &basedirs),
+                expected
+            );
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    #[test]
+    fn test_strip_path_basedirs_wildcard_unix() {
+        let basedirs = vec![
+            b"/work/worktrees/zed/*/".to_vec(),
+            b"/work/worktrees/zed/agent-task-*/".to_vec(),
+        ];
+
+        for (input, expected) in [
+            (
+                b"/work/worktrees/zed/agent-task-1/src/lib.rs".as_slice(),
+                b"src/lib.rs".as_slice(),
+            ),
+            (
+                b"/work/worktrees/zed/agent-task-1".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"/work/worktrees/zed/agent-task-1/".as_slice(),
+                b"".as_slice(),
+            ),
+            (
+                b"/work/worktrees/zed/agent-task-1///src/lib.rs".as_slice(),
+                b"src/lib.rs".as_slice(),
+            ),
+            (
+                b"/work/worktrees/zed/random/src/lib.rs".as_slice(),
+                b"src/lib.rs".as_slice(),
+            ),
+            (
+                b"/other/worktrees/zed/agent-task-1/src/lib.rs".as_slice(),
+                b"/other/worktrees/zed/agent-task-1/src/lib.rs".as_slice(),
+            ),
+            (
+                b"/work/worktrees/zed/agent-task-1/extra/src/lib.rs".as_slice(),
+                b"extra/src/lib.rs".as_slice(),
+            ),
+        ] {
+            assert_eq!(super::strip_path_basedirs(input, &basedirs), expected);
+        }
     }
 }
