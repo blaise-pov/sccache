@@ -9,6 +9,16 @@
 sccache - Shared Compilation Cache
 ==================================
 
+> [!NOTE]
+> **Why use this fork?**
+> Upstream sccache only reuses cached builds if files are located in the exact same path.
+> This fork introduces **cross-directory cache sharing** via `SCCACHE_BASEDIRS`:
+> - **Build in any folder:** Reuse cached results across different Git worktrees and project checkouts.
+> - **Full Rust and C/C++ support:** Automatically normalizes source paths so identical code is not recompiled.
+> - **Team & CI cache sharing:** Share cache entries between different machines and CI runners even if root folders differ.
+>
+> To use it, simply define `SCCACHE_BASEDIRS=/path/to/project`. See [Normalizing paths](#normalizing-paths-with-sccache_basedirs) for details.
+
 sccache is a [ccache](https://ccache.dev/)-like compiler caching tool. It is used as a compiler wrapper and avoids compilation when possible, storing cached results either on [local disk](docs/Local.md) or in one of [several cloud storage backends](#storage-options). Multi-level caching with automatic backfill is supported for hierarchical cache architectures (see [Multi-Level Cache](docs/MultiLevel.md)).
 
 sccache includes support for caching the compilation of Assembler, C/C++ code, [Rust](docs/Rust.md), as well as NVIDIA's CUDA using [nvcc](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html), and [clang](https://llvm.org/docs/CompileCudaWithLLVM.html), [AMD's ROCm HIP](https://rocm.docs.amd.com/projects/HIP/en/latest/index.html).
