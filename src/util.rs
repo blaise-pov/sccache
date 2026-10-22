@@ -1766,12 +1766,12 @@ pub fn strip_path_basedirs<'a>(value: &'a [u8], basedirs: &[Vec<u8>]) -> &'a [u8
                     None
                 }
             };
-            if let Some(match_len) = match_len {
-                if longest.is_none_or(|(length, match_l)| {
+            if let Some(match_len) = match_len
+                && longest.is_none_or(|(length, match_l)| {
                     match_len > match_l || (match_len == match_l && configured_len > length)
-                }) {
-                    longest = Some((configured_len, match_len));
-                }
+                })
+            {
+                longest = Some((configured_len, match_len));
             }
         }
 
